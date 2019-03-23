@@ -1,10 +1,20 @@
 ## fp soundcloud scripts
 
-helps analyze what music the followers of False Profit like
+what producers/DJs are popular in the False Profit and Priceless
+communities? let us seek answers.
+
+### methodology
+
+1. compile a list of unique followers of 3 soundcloud accounts associated with
+   False Profit: https://soundcloud.com/falseprofitinc,
+   https://soundcloud.com/pricelessfestival, and
+   https://soundcloud.com/falseprofitrecords.
+2. look at what other accounts these people are following
+3. rank the accounts by most-followed-among-followers-of-false-profit-accounts
 
 ### instructions
 
-run `node main.js`
+run `node main.js`.
 
 the results will be written to STDOUT, so you probably want to do `node main.js > results.txt` if you want the results written to a file.
 

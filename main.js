@@ -26,12 +26,32 @@ const artistCounts = {}
 const MAX_FOLLOWS = 10000 // assume each user only follows at most 10000 artists
 const CLIENT_ID = 'z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF' // soundcloud API client id
 
+// The number of accounts that we have analyzed already
+let finished = 0
+
+// Helper function to display results and quit
+function logResults () {
+  // JS doesn't have sortable objects but it can sort arrays
+  const sortable = []
+  for (let artist in artistCounts) {
+    const count = artistCounts[artist]
+    sortable.push([artist, count])
+  }
+  // Sort by the object value, which is the artist count.
+  sortable.sort((a, b) => a[1] - b[1])
+  sortable.reverse().forEach((artistEntry) => {
+    console.log(`${artistEntry[0]}: ${artistEntry[1]}`)
+  })
+  process.exit()
+}
+
 // Helper function to fetch soundcloud URLs and parse the response into artist
 // counts
 function fetchSoundcloudUrl (soundcloudUrl) {
   https.get(soundcloudUrl, (res) => {
     if (res.statusCode !== 200) {
       console.error(`Could not complete request to ${soundcloudUrl}`)
+      finished += 1
     } else {
       res.setEncoding('utf8')
       let rawData = ''
@@ -53,7 +73,13 @@ function fetchSoundcloudUrl (soundcloudUrl) {
               artistCounts[artistUrl] = 1
             }
           })
+          // If we have finished processing all accounts, log the results
+          finished += 1
+          if (finished === followerIds.size) {
+            logResults()
+          }
         } catch (e) {
+          finished += 1
           console.error(e.message)
         }
       })
@@ -67,23 +93,6 @@ followerIds.forEach((id) => {
   fetchSoundcloudUrl(soundcloudUrl)
 })
 
-// Wait 30 seconds for all of the requests to finish, then log the sorted results.
-// TODO: This should count the requests and log when they're all finished since
-// 30s is a completely arbitrary amount of time that I made up.
-setTimeout(() => {
-  // JS doesn't have sortable objects but it can sort arrays
-  const sortable = []
-  for (let artist in artistCounts) {
-    const count = artistCounts[artist]
-    // push the object key and object value into an array
-    // only show artists with 3+ counts
-    if (count > 2) {
-      sortable.push([artist, count])
-    }
-  }
-  // Sort by the object value, which is the artist count.
-  sortable.sort((a, b) => a[1] - b[1])
-  sortable.reverse().forEach((artistEntry) => {
-    console.log(`${artistEntry[0]}: ${artistEntry[1]}`)
-  })
-}, 30 * 1000)
+// Quit in 20s if the script hasn't finished running by then so it doesn't hang
+// forever
+setTimeout(logResults, 20 * 1000)

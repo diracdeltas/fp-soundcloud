@@ -7,7 +7,7 @@ const rawFollowersData = JSON.parse(fs.readFileSync('false-profit-followers.json
 
 // the data that we want is in the 'collection' property of the JSON object
 const followers = rawFollowersData.collection
-console.log(`False Profit has ${followers.length} followers`)
+console.log(`False Profit has ${followers.length} followers! Here's the most-followed artists that they follow:`)
 
 // Now go through the followers of False Profit and get their user IDs
 const followerIds = followers.map((follower) => {
@@ -19,7 +19,7 @@ const followerIds = followers.map((follower) => {
 // Build an object which counts how many people follow a given artist.
 
 const artistCounts = {}
-const MAX_FOLLOWS = 2000 // assume each user only follows at most 2000 artists
+const MAX_FOLLOWS = 10000 // assume each user only follows at most 10000 artists
 const CLIENT_ID = 'z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF' // soundcloud API client id
 
 // Helper function to fetch soundcloud URLs and parse the response into artist

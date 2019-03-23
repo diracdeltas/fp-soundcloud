@@ -1,13 +1,16 @@
 const fs = require('fs')
 const https = require('https')
 
-// read and parse the JSON file containing a list of people who follow False
-// Profit on Soundcloud
-const rawFollowersData = JSON.parse(fs.readFileSync('false-profit-followers.json'))
+// List of all followers from the JSON files in this directory
+let followers = []
 
-// the data that we want is in the 'collection' property of the JSON object
-const followers = rawFollowersData.collection
-console.log(`False Profit has ${followers.length} followers! Here's the most-followed artists that they follow:`)
+// scan current directory for JSON files to parse
+fs.readdirSync('.').forEach((filename) => {
+  if (filename.endsWith('.json')) {
+    const followersData = JSON.parse(fs.readFileSync(filename))
+    followers = followers.concat(followersData.collection)
+  }
+})
 
 // Now go through the followers of False Profit and get their user IDs
 const followerIds = followers.map((follower) => {
@@ -63,9 +66,9 @@ followerIds.forEach((id, index) => {
   fetchSoundcloudUrl(soundcloudUrl)
 })
 
-// Wait 10 seconds for all of the requests to finish, then log the sorted results.
+// Wait 20 seconds for all of the requests to finish, then log the sorted results.
 // TODO: This should count the requests and log when they're all finished since
-// 10s is a completely arbitrary amount of time that I made up.
+// 20s is a completely arbitrary amount of time that I made up.
 setTimeout(() => {
   // JS doesn't have sortable objects but it can sort arrays
   const sortable = []
@@ -78,4 +81,4 @@ setTimeout(() => {
   sortable.reverse().forEach((artistEntry) => {
     console.log(`${artistEntry[0]}: ${artistEntry[1]}`)
   })
-}, 10 * 1000)
+}, 20 * 1000)

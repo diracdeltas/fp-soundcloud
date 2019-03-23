@@ -6,8 +6,7 @@ helps analyze what music the followers of False Profit like
 
 run `node main.js`
 
-the results will be written to STDOUT, so you probably want to do `node main.js
-> results.txt` if you want the results written to a file.
+the results will be written to STDOUT, so you probably want to do `node main.js > results.txt` if you want the results written to a file.
 
 ### updating
 

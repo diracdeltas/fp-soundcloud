@@ -23,7 +23,7 @@ const followerIds = new Set(followers.map((follower) => {
 // Build an object which counts how many people follow a given artist.
 
 const artistCounts = {}
-const MAX_FOLLOWS = 10000 // assume each user only follows at most 10000 artists
+const MAX_FOLLOWS = 2000 // maximum follows allowed on Soundcloud
 const CLIENT_ID = 'z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF' // soundcloud API client id
 
 // The number of accounts that we have analyzed already

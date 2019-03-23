@@ -12,10 +12,11 @@ fs.readdirSync('.').forEach((filename) => {
   }
 })
 
-// Now go through the followers of False Profit and get their user IDs
-const followerIds = followers.map((follower) => {
+// Now go through the followers and get their user IDs
+// Use a Set to remove duplicates
+const followerIds = new Set(followers.map((follower) => {
   return follower.id
-})
+}))
 
 // For each user ID, go to the soundcloud API endpoint for them and get the
 // list of artist profile URLs that they follow.
@@ -60,25 +61,29 @@ function fetchSoundcloudUrl (soundcloudUrl) {
   })
 }
 
-followerIds.forEach((id, index) => {
+followerIds.forEach((id) => {
   const soundcloudUrl = `https://api-v2.soundcloud.com/users/${id}/followings?offset=0&limit=${MAX_FOLLOWS}&client_id=${CLIENT_ID}&app_version=1553260698&app_locale=en`
   // Fetch the URL
   fetchSoundcloudUrl(soundcloudUrl)
 })
 
-// Wait 20 seconds for all of the requests to finish, then log the sorted results.
+// Wait 30 seconds for all of the requests to finish, then log the sorted results.
 // TODO: This should count the requests and log when they're all finished since
-// 20s is a completely arbitrary amount of time that I made up.
+// 30s is a completely arbitrary amount of time that I made up.
 setTimeout(() => {
   // JS doesn't have sortable objects but it can sort arrays
   const sortable = []
   for (let artist in artistCounts) {
+    const count = artistCounts[artist]
     // push the object key and object value into an array
-    sortable.push([artist, artistCounts[artist]])
+    // only show artists with 3+ counts
+    if (count > 2) {
+      sortable.push([artist, count])
+    }
   }
   // Sort by the object value, which is the artist count.
   sortable.sort((a, b) => a[1] - b[1])
   sortable.reverse().forEach((artistEntry) => {
     console.log(`${artistEntry[0]}: ${artistEntry[1]}`)
   })
-}, 20 * 1000)
+}, 30 * 1000)

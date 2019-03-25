@@ -4,6 +4,9 @@ const https = require('https')
 // List of all followers from the JSON files in this directory
 let followers = []
 
+// Abort this script if not done within this amount of time, in seconds
+const timeout = 40
+
 // scan current directory for JSON files to parse
 fs.readdirSync('.').forEach((filename) => {
   if (filename.endsWith('.json')) {
@@ -23,7 +26,7 @@ const followerIds = new Set(followers.map((follower) => {
 // Build an object which counts how many people follow a given artist.
 
 const artistCounts = {}
-const MAX_FOLLOWS = 2000 // maximum follows allowed on Soundcloud
+const MAX_LIMIT = 200 // maximum entries per collection in SC's API
 const CLIENT_ID = 'z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF' // soundcloud API client id
 
 // The number of accounts that we have analyzed already
@@ -48,6 +51,7 @@ function logResults () {
 // Helper function to fetch soundcloud URLs and parse the response into artist
 // counts
 function fetchSoundcloudUrl (soundcloudUrl) {
+  soundcloudUrl = `${soundcloudUrl}&client_id=${CLIENT_ID}&app_version=1553260698&app_locale=en`
   https.get(soundcloudUrl, (res) => {
     if (res.statusCode !== 200) {
       console.error(`Could not complete request to ${soundcloudUrl}`)
@@ -63,6 +67,7 @@ function fetchSoundcloudUrl (soundcloudUrl) {
           // Parse the JSON data to get the followers
           const parsedData = JSON.parse(rawData)
           const artistsFollowed = parsedData.collection
+          const nextHref = parsedData.next_href
           // For each artist followed, get their page URL, then increment the
           // artist count by 1
           artistsFollowed.forEach((artist) => {
@@ -73,10 +78,15 @@ function fetchSoundcloudUrl (soundcloudUrl) {
               artistCounts[artistUrl] = 1
             }
           })
-          // If we have finished processing all accounts, log the results
-          finished += 1
-          if (finished === followerIds.size) {
-            logResults()
+          if (nextHref) {
+            // Follow pagination link to the page of the collection
+            fetchSoundcloudUrl(nextHref)
+          } else {
+            // If we have finished processing all accounts, log the results
+            finished += 1
+            if (finished === followerIds.size) {
+              logResults()
+            }
           }
         } catch (e) {
           finished += 1
@@ -88,11 +98,9 @@ function fetchSoundcloudUrl (soundcloudUrl) {
 }
 
 followerIds.forEach((id) => {
-  const soundcloudUrl = `https://api-v2.soundcloud.com/users/${id}/followings?offset=0&limit=${MAX_FOLLOWS}&client_id=${CLIENT_ID}&app_version=1553260698&app_locale=en`
+  const soundcloudUrl = `https://api-v2.soundcloud.com/users/${id}/followings?linked_partitioning=1&limit=${MAX_LIMIT}`
   // Fetch the URL
   fetchSoundcloudUrl(soundcloudUrl)
 })
 
-// Quit in 20s if the script hasn't finished running by then so it doesn't hang
-// forever
-setTimeout(logResults, 20 * 1000)
+setTimeout(logResults, timeout * 1000)

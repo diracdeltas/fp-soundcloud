@@ -27,6 +27,6 @@ https://api-v2.soundcloud.com/users/157523163/followers?client_id=z7npDMrLmgiW4w
 https://api-v2.soundcloud.com/users/465157974/followers?offset=0&limit=200&client_id=z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF&app_version=1553260698&app_locale=en.
 
 `fp-records-followers.json` was pulled from
-https://api-v2.soundcloud.com/users/5348967/followers?offset=0&limit=500&client_id=z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF&app_version=1553260698&app_locale=en.
+https://api-v2.soundcloud.com/users/5348967/followers?linked_partitioning=1&limit=200&client_id=z7npDMrLmgiW4wc8pPCQkkUUtRQkWZOF&app_version=1553260698&app_locale=en.
 
 You may want to update these files periodically.

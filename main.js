@@ -17,9 +17,20 @@ fs.readdirSync('.').forEach((filename) => {
 
 // Now go through the followers and get their user IDs
 // Use a Set to remove duplicates
-const followerIds = new Set(followers.map((follower) => {
-  return follower.id
-}))
+const followerIds = new Set(followers
+  .filter((follower) => {
+    // Filter out accounts without recent activity
+    if (follower.last_modified) {
+      const date = new Date(follower.last_modified)
+      const year = date.getFullYear()
+      return year > 2017
+    }
+    return false
+  })
+  .map((follower) => {
+    return follower.id
+  })
+)
 
 // For each user ID, go to the soundcloud API endpoint for them and get the
 // list of artist profile URLs that they follow.
